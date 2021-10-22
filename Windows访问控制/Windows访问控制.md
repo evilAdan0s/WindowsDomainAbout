@@ -2,6 +2,7 @@
 Windows的访问控制模型由两个基本部分组成：
 - 访问令牌（Access Token），包含已登录用户的信息
 - 安全描述符（Security Descriptors），包含用于保护安全对象的安全信息
+
 其余相关的概念还有安全标识符、特权等。
 
 # 访问令牌
@@ -21,12 +22,17 @@ Windows的访问控制模型由两个基本部分组成：
 主令牌也叫授权令牌（Delegation Token），用于交互式登录（如RDP登录访问）；而模拟令牌（Impersonation Token）用于非交互式的会话（如WMI远程访问）。访问令牌存储于内存中，重启或关机后才会清除。默认情况用户只能查看用户自己和比自己权限低的所有访问令牌。
 
 可以通过`WinDbg`等调试工具来查看访问令牌的结构。
+
 举例，现在想查看进程`Lenovo.Modern.ImController.exe`的访问令牌结构，使用命令`!process 0 0 Lenovo.Modern.ImController.exe`得到进程的`EPROCESS`结构的地址：
+
 ![](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/typora/image-20211001121745126.png#alt=image-20211001121745126)
+
 `EPROCESS`是内核的一个结构，代表进程的进程对象。
 
 之后使用`!process ffff84898fc9c080`查看此进程的信息，可以得到Token地址：
+
 ![](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/typora/image-20211001122225885.png#alt=image-20211001122225885)
+
 接着使用`!token 地址`的命令即可看到。
 
 在用户模式下，如果不指定句柄，则显示与目标线程关联的标记，`-n`参数可以显示包含用户名的信息。
@@ -39,12 +45,15 @@ Windows的访问控制模型由两个基本部分组成：
 * 控制位，限定安全描述符或单个成员的含义
 
 使用`WinDbg`进行双机调试，`!process 0 0 cmd.exe`获得`cmd.exe`的`EPROCESS`结构的地址：
+
 ![](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/typora/image-20211001174455229.png#alt=image-20211001174455229)
 
 再使用`!object fffffa8002e5bb30`查看`ObjectHeader`的地址：
+
 ![](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/typora/image-20211001174639010.png#alt=image-20211001174639010)
 
 接着使用`dt nt!_OBJECT_HEADER fffffa8002e5bb00`获得此对象的`SecurityDescriptor`地址，它指向安全描述符的位置。这里的地址要计算偏移，即`[address] & ~0x7`，原因参考： [Determining the ACL of an Object](https://docs.microsoft.com/zh-cn/windows-hardware/drivers/debugger/determining-the-acl-of-an-object) 
+
 ![](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/typora/image-20211001174908511.png#alt=image-20211001174908511)
 
 对于DACL或SACL，都包含了零个或多个ACE（访问控制项），主要内容为：
@@ -64,6 +73,7 @@ ACE主要有三种类型是所有安全对象都支持的：
 上面多次提到了安全标识符（SID），它是用来标识受信者的唯一值，长度可变。每个账户都有一个唯一的SID，存储在安全数据库中，用户每次登录，系统都会检索相应的SID并放入访问令牌中。
 
 SID的组成如下图：
+
 ![](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/typora/t019b6c4ddbe0ebb052.png#alt=img)
 
 Windows中常见的组或身份及SID：
@@ -90,13 +100,16 @@ Windows的权限检查流程是通过访问令牌和安全描述符相结合实�
 - 如果对比完了所有ACE，还有一个及以上的访问请求没有显式允许，那么将隐式拒绝访问
 
 ![20211022132324IQYSen](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/uPic/20211022132324IQYSen.jpg)
+
 线程A被拒绝访问，因为在对比的时候，类型为拒绝访问的ACE1的受信者中含有一个线程A的受信者；线程B被允许访问，因为依次对比的时候，线程B的两个受信者分别在ACE2和ACE3都符合受信者的身份要求。
 
 从上面的例子可以看出，DACL中ACE的顺序非常重要，不同的顺序会造成不同的结果。
 
 # 权限
 权限是指账户的权限，用于在本地计算机上执行各种与系统相关的操作，例如关闭系统等。
+
 通过`whoami /priv`命令可以查看当前用户的权限信息：
+
 ![20211022133333ay24q5](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/uPic/20211022133333ay24q5.png)
 
 权限和上面的访问控制有两点不同：
@@ -106,7 +119,9 @@ Windows的权限检查流程是通过访问令牌和安全描述符相结合实�
 当用户执行特权操作时，系统会检查用户是否具有此特权，如果具有，则检查是否启用了此特权，是则允许执行，否则将拒绝。
 
 访问令牌中存在用户及所属组的特权信息：
+
 ![](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/typora/image-20211010234253742.png#alt=image-20211010234253742)
+
 注意，这些特权仅适用于本地计算机，而域帐户可以在不同的计算机上具有不同的权限。
 
 # 用户帐户控制
@@ -115,4 +130,5 @@ Windows的权限检查流程是通过访问令牌和安全描述符相结合实�
 当普通用户运行需要管理员权限的应用程序时，UAC会要求该用户提供管理员级别的访问凭据。
 
 在UAC下，管理员登录时，系统会授予一个普通用户令牌和一个管理员令牌，普通用户令牌用来执行不需要管理员权限的应用程序，`Explorer.exe`也是使用普通令牌启动的，所以用户启动的其他应用程序同样是普通用户权限。
+
 ![20211022135952SoI7gF](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/uPic/20211022135952SoI7gF.jpg)
