@@ -17,7 +17,7 @@ Kerberos协议认证过程中主要存在三种角色：
 
 Kerberos协议的认证流程如下图所示：
 
-![](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/typora/image001.png#alt=Kerberos%20V5%20Exchanges)
+![](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/uPic/20211027112800783vop.png)
 
 ## 1. KRB_AS_REQ
 
