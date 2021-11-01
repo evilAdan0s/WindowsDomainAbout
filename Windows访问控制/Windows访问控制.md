@@ -1,4 +1,3 @@
-# Windows访问控制
 Windows的访问控制模型由两个基本部分组成：
 - 访问令牌（Access Token），包含已登录用户的信息
 - 安全描述符（Security Descriptors），包含用于保护安全对象的安全信息

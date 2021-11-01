@@ -1,6 +1,3 @@
-# Kerberos扩展及应用
-
-
 # 一、PAC
 
 
