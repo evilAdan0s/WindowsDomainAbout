@@ -1,4 +1,6 @@
 # WindowsDomainAbout
+> "成就他人是一个伟大的行为，我将贯彻到底。" —— hl0rey
+
 Windows域安全相关概念、协议、流程，个人笔记，适合新手阅读。
 
 Gitbook页面：[WindowsDomainAbout](https://eviladan0s.gitbook.io/windowsdomainabout/)
