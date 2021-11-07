@@ -14,7 +14,7 @@ NTLM认证通常被用于Windows本地身份认证和网络身份认证，与之
 
 将其放到域内，流程如下图：
 
-![image-20211107160343403](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/typora/image-20211107160343403.png)
+![](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/typora/image-20211107160343403.png)
 
 1. `User`登录`Client Computer`
 2. `Client Computer`向`Server`发送协商消息，确认支持的功能、版本等
@@ -32,7 +32,7 @@ NTLM认证通常被用于Windows本地身份认证和网络身份认证，与之
 
 `LMCompatibilityLevel`即LAN身份验证级别，它决定了客户端所使用的身份验证协议等级以及服务端接收的身份验证协议等级等，配置项及含义如下：
 
-![image-20211107170452534](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/typora/image-20211107170452534.png)
+![](https://adan0s-1256533472.cos.ap-nanjing.myqcloud.com/typora/image-20211107170452534.png)
 
 - **发送 LM和NTLM 响应(&)**：客户端使用 LM 和 NTLM 身份验证，而决不会使用 NTLMv2 会话安全；域控制器接受 LM、NTLM 和 NTLMv2 身份验证
 
